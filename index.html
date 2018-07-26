@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>CSV differ</title>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>
+    </head>
+    <body>
+        <nav>
+            <div class="nav-wrapper">
+                <a class="brand-logo center" href="#">CSV differ</a>
+            </div>
+        </nav>
+        <div class="container" id="container">
+            <div class="row">
+                <blockquote>Usage: + to add new List</blockquote>
+                <form>
+                <a class="btn-floating waves-effect waves-light green" @click="addList"><i class="material-icons">add</i></a>
+				<table>
+				<thead>
+					<tr>
+						<th>Action</th>
+						<th>Name <a class="red-text tooltipped" data-position="right" data-tooltip="accept only A-Z / a-z / 0-9, and no duplicated name"><i class="material-icons">info</i></a></th>
+						<th>Value</th>
+						<th>Count</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="(item, i) in lists">
+						<td>
+							<button type="button" class="btn btn-small green" @click="addToRequst(item.name)"><i class="material-icons">add</i></button>
+							<button type="button" class="btn btn-small red" @click="removeMe(i)"><i class="material-icons">clear</i></button>
+						</td>
+						<td><input v-model="item.name"></td>
+						<td><textarea v-model="item.value">{{ item.value }}</textarea></td>
+						<td class="center"><p>{{ item.value.split(/r*\n/).length }}</p></td>
+					</tr>
+				</tbody>
+				</table>
+                <!-- input string-->
+                <div class="input-field col s12">
+                	<span>Operator:</span>
+                    <button type="button" style="margin-left: 1rem;" class="waves-effect waves-light btn grey" v-for="ch in characters" v-on:click="addCh(ch)">
+                        {{ ch }}
+                    </button>
+                </div>
+                <div class="input-field col s10">
+                    <input class="validate inline" type="text" v-model="requestString" placeholder="click operators or actions to add contents">
+                </div>
+                <div class="input-field col s2">
+                    <button type="button" class="btn blue" @click="computeResult">Compute</button>
+                </div>
+
+                <!-- show result -->
+                <div class="col s12" v-show="resultList.count >= 0">
+                    <p>Count: {{ resultList.count }}</p>
+                    <textarea>{{ resultList.text }}</textarea>
+                </div>
+            	</form>
+            </div>
+        </div>
+        <main>
+        </main>
+        <footer class="page-footer">
+            <div class="footer-copyright">
+                <div class="container">
+                    © 2018 Copyright
+                    <div class="right">
+                        <a class="grey-text text-lighten-4" href="https://github.com/elleyyu">
+                            Contact me
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </footer>
+    </body>
+</html>
+<script type="text/javascript">
+    var container = new Vue({
+    el: '#container',
+    data() {
+		return {
+			lists: [{name: 'List1', value: ''}],
+			listNum: 2,
+			requestString: '',
+			characters: ['∩', '∪', '-'],
+			resultList: [],
+		};
+	},
+
+    methods: {
+      addList() {
+      	this.lists.push({name: 'List'+this.listNum, value: ''});
+      	this.listNum ++;
+      },
+      addToRequst(list) {
+      	this.requestString += list;
+        this.requestString += ' ';
+      },
+      addCh(ch) {
+        this.requestString += ch;
+        this.requestString += ' ';
+      },
+      removeMe(i) {
+      	this.lists.splice(i, 1);
+      },
+      computeResult() {
+      	let self = this;
+      	$.ajax({
+      		type: 'POST',
+      		url: 'compute.php',
+      		dataType: 'json',
+      		data: {
+      			lists: this.lists,
+      			requestString: this.requestString,
+      		},
+      		success: function (response) {
+      			self.resultList = response;
+      		}
+      	});
+      },
+    },
+
+    mounted() {
+    	$('.tooltipped').tooltip();
+    },
+  });
+</script>
+<style type="text/css">
+    body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+  main {
+    flex: 1 0 auto;
+  }
+</style>
