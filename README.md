@@ -1,7 +1,7 @@
 # csv-differ
 
 
-### Requirement
+### Requirements
 
 * php >= 5.6 (suggest php 7.0)
 * Apache
@@ -16,5 +16,3 @@ php -S localhost:8000
 ```
 
 and then open `http://localhost:8000`
-
-
