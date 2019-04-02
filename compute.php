@@ -43,6 +43,7 @@ foreach ($lists as $key => $list) {
 
 eval("\$result = $requestString;");
 
+$result = array_unique($result);
 echo json_encode([
 	'count' => count($result),
 	'text' => implode(PHP_EOL, $result),
