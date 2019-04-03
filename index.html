@@ -18,7 +18,7 @@
             <div class="row">
                 <blockquote>Usage: Press + to add new List</blockquote>
                 <form>
-                <a class="btn-floating waves-effect waves-light green" @click="addList"><i class="material-icons" title="add a list">add</i></a>
+                <a class="btn-floating waves-effect waves-light green" @click="addList('')"><i class="material-icons" title="add a list">add</i></a>
 				<table>
 				<thead>
 					<tr>
@@ -37,10 +37,10 @@
 							<button type="button" class="btn btn-small red" @click="removeThis(i)">
                 <i class="material-icons" title="delete this list">clear</i>
               </button>
-              <button type="button" class="btn btn-small orange" @click="goUp(i)">
+              <button type="button" class="btn btn-small orange" :class="(i == 0)? 'disabled':''" @click="goUp(i)">
                 <i class="material-icons" title="go up">arrow_upward</i>
               </button>
-              <button type="button" class="btn btn-small orange" @click="goDown(i)">
+              <button type="button" class="btn btn-small orange" :class="(i == lists.length-1)? 'disabled':''" @click="goDown(i)">
                 <i class="material-icons" title="do down">arrow_downward</i>
               </button>
 						</td>
@@ -69,6 +69,7 @@
                 <div class="col s12" v-show="resultList.count >= 0">
                     <p>Count: {{ resultList.count }}</p>
                     <textarea readonly="readonly">{{ resultList.text }}</textarea>
+                    <button type="button" class="btn green" @click="addList( resultList.text )">Copy this result to a new list</button>
                 </div>
             	</form>
             </div>
@@ -108,9 +109,9 @@
 	},
 
     methods: {
-      addList() {
-      	this.lists.push({name: 'List'+this.listNum, value: ''});
-      	this.listNum ++;
+      addList(v) {
+        this.lists.push({name: 'List'+this.listNum, value: v});
+        this.listNum ++;
       },
       addToRequst(list) {
       	this.requestString += list;
@@ -124,9 +125,7 @@
       	this.lists.splice(i, 1);
       },
       goUp(i) {
-        if (i > 0) {
-          this.lists.splice(i-1, 0, this.lists.splice(i, 1)[0]);
-        }
+        this.lists.splice(i-1, 0, this.lists.splice(i, 1)[0]);
       },
       goDown(i) {
         this.lists.splice(i+1, 0, this.lists.splice(i, 1)[0]);
